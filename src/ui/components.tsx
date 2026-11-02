@@ -1,0 +1,44 @@
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type TextInputProps, type ViewStyle } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ArrowLeft, ArrowRight, Check, CircleAlert, Link2, Plus, X, type LucideIcon } from 'lucide-react-native';
+import * as Haptics from 'expo-haptics';
+import * as Clipboard from 'expo-clipboard';
+import { c, s } from './theme';
+
+export function Brand({ small = false }: { small?: boolean }) {
+  return <View style={[s.row, { gap: 9 }]}><View style={{ width: small ? 30 : 38, height: small ? 30 : 38, backgroundColor: c.dark, borderRadius: small ? 10 : 12, alignItems: 'center', justifyContent: 'center', transform: [{ rotate: '-7deg' }] }}><Link2 size={small ? 19 : 24} color={c.lime} strokeWidth={2.5} /></View><Text style={{ fontSize: small ? 20 : 24, letterSpacing: -1, fontWeight: '800', color: c.ink }}>lnkshrt<Text style={{ color: c.green }}>.</Text></Text></View>;
+}
+export function IconButton({ icon: Icon, label, onPress, style, color = c.ink }: { icon: LucideIcon; label: string; onPress(): void; style?: ViewStyle; color?: string }) {
+  return <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={({ pressed }) => [{ minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 14, opacity: pressed ? .55 : 1 }, style]}><Icon size={21} color={color} strokeWidth={1.8} /></Pressable>;
+}
+export function Button({ title, onPress, variant = 'primary', loading = false, disabled = false, icon: Icon, style }: { title: string; onPress(): void; variant?: 'primary' | 'secondary' | 'lime' | 'danger'; loading?: boolean; disabled?: boolean; icon?: LucideIcon; style?: ViewStyle }) {
+  const color = variant === 'primary' ? '#FFF' : variant === 'danger' ? c.red : c.ink;
+  const backgroundColor = variant === 'primary' ? c.dark : variant === 'lime' ? c.lime : variant === 'danger' ? c.redBg : c.pale;
+  return <Pressable accessibilityRole="button" accessibilityState={{ disabled: disabled || loading, busy: loading }} onPress={onPress} disabled={disabled || loading} style={({ pressed }) => [{ minHeight: 53, paddingHorizontal: 18, paddingVertical: 14, borderRadius: 15, backgroundColor, opacity: disabled ? .45 : pressed ? .7 : 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 }, style]}>{loading ? <ActivityIndicator color={color} /> : Icon ? <Icon size={19} color={color} /> : null}<Text style={{ fontSize: 15, fontWeight: '700', color }}>{title}</Text></Pressable>;
+}
+export function Field({ label, hint, error, style, ...props }: TextInputProps & { label: string; hint?: string; error?: string }) {
+  return <View style={{ gap: 8 }}><Text style={{ fontSize: 14, color: c.ink, fontWeight: '600' }}>{label}</Text><TextInput accessibilityLabel={label} placeholderTextColor="#9AA39B" autoCorrect={false} style={[{ borderWidth: 1, borderColor: error ? c.red : c.line, borderRadius: 14, backgroundColor: c.paper, paddingHorizontal: 15, minHeight: 53, paddingVertical: 13, color: c.ink, fontSize: 15 }, style]} {...props} />{error || hint ? <Text style={[s.small, error ? { color: c.red } : null]}>{error || hint}</Text> : null}</View>;
+}
+export function InlineError({ message }: { message?: string }) { return message ? <View accessibilityRole="alert" style={{ backgroundColor: c.redBg, padding: 14, borderRadius: 12 }}><Text style={[s.muted, { color: c.red }]}>{message}</Text></View> : null; }
+export function Section({ title, action, onPress }: { title: string; action?: string; onPress?: () => void }) { return <View style={s.between}><Text style={s.h2}>{title}</Text>{action && onPress ? <Pressable accessibilityRole="button" onPress={onPress} style={[s.row, { gap: 5, minHeight: 44 }]}><Text style={{ color: c.green, fontSize: 13, fontWeight: '600' }}>{action}</Text><ArrowRight size={15} color={c.green} /></Pressable> : null}</View>; }
+export function Loading({ label = 'Getting your links…' }: { label?: string }) { return <View style={{ paddingVertical: 40, alignItems: 'center', gap: 13 }}><ActivityIndicator color={c.green} /><Text style={s.muted}>{label}</Text></View>; }
+export function Empty({ title, detail, action, onPress, icon: Icon = Link2 }: { title: string; detail: string; action?: string; onPress?: () => void; icon?: LucideIcon }) { return <View style={[s.card, { alignItems: 'center', gap: 14, paddingVertical: 32 }]}><View style={{ padding: 16, borderRadius: 20, backgroundColor: c.pale }}><Icon size={27} color={c.green} /></View><Text style={[s.h2, { textAlign: 'center' }]}>{title}</Text><Text style={[s.muted, { textAlign: 'center', maxWidth: 290 }]}>{detail}</Text>{action && onPress ? <Button title={action} onPress={onPress} icon={Plus} /> : null}</View>; }
+export function ErrorBlock({ error, retry }: { error: unknown; retry(): void }) { return <View style={[s.card, { gap: 12 }]}><CircleAlert color={c.red} size={24} /><Text style={s.h2}>Couldn’t load this</Text><Text style={s.muted}>{error instanceof Error ? error.message : 'Please try again.'}</Text><Button title="Try again" variant="secondary" onPress={retry} /></View>; }
+export function Sheet({ visible, title, onClose, children }: React.PropsWithChildren<{ visible: boolean; title: string; onClose(): void }>) {
+  const insets = useSafeAreaInsets();
+  return <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose} statusBarTranslucent><KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: '#14201777', justifyContent: 'flex-end' }}><View style={{ maxHeight: '93%', flexShrink: 1, backgroundColor: c.bg, borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingBottom: Math.max(insets.bottom, 15), width: '100%', maxWidth: 620, alignSelf: 'center' }}><View style={{ height: 5, width: 38, borderRadius: 4, backgroundColor: c.line, alignSelf: 'center', marginTop: 10 }} /><View style={[s.between, { paddingHorizontal: 22, paddingVertical: 12 }]}><Text style={s.h2}>{title}</Text><IconButton icon={X} label="Close" onPress={onClose} /></View><ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingHorizontal: 22, paddingBottom: 20, gap: 20 }} showsVerticalScrollIndicator={false}>{children}</ScrollView></View></KeyboardAvoidingView></Modal>;
+}
+export function Confirm({ visible, title, detail, action, destructive, loading, error, onConfirm, onClose }: { visible: boolean; title: string; detail: string; action: string; destructive?: boolean; loading?: boolean; error?: string; onConfirm(): void; onClose(): void }) {
+  return <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}><View style={{ flex: 1, justifyContent: 'center', padding: 26, backgroundColor: '#12201888' }}><View style={[s.card, { width: '100%', maxWidth: 420, alignSelf: 'center', gap: 18 }]}><Text style={s.h2}>{title}</Text><Text style={s.muted}>{detail}</Text><InlineError message={error} /><Button title={action} onPress={onConfirm} variant={destructive ? 'danger' : 'primary'} loading={loading} /><Button title="Cancel" onPress={onClose} variant="secondary" disabled={loading} /></View></View></Modal>;
+}
+export function BackTitle({ title, onBack }: { title: string; onBack(): void }) { return <View style={[s.row, { gap: 10 }]}><IconButton label="Go back" icon={ArrowLeft} onPress={onBack} /><Text style={s.h2}>{title}</Text></View>; }
+const ToastContext = createContext<(message: string) => void>(() => {});
+export function ToastProvider({ children }: React.PropsWithChildren) {
+  const [toast, setToast] = useState<{ message: string; id: number } | null>(null);
+  const insets = useSafeAreaInsets();
+  useEffect(() => { if (!toast) return; const timer = setTimeout(() => setToast(null), 3000); return () => clearTimeout(timer); }, [toast]);
+  return <ToastContext.Provider value={message => setToast({ message, id: Date.now() })}>{children}{toast ? <View pointerEvents="none" style={{ position: 'absolute', bottom: Math.max(insets.bottom, 12) + 82, left: 22, right: 22, alignItems: 'center' }}><View accessibilityRole="alert" style={[s.row, { backgroundColor: c.dark, paddingHorizontal: 18, paddingVertical: 14, borderRadius: 16, maxWidth: 460, gap: 10 }]}><Check color={c.lime} size={18} /><Text style={{ color: '#FFF', fontSize: 14, flexShrink: 1 }}>{toast.message}</Text></View></View> : null}</ToastContext.Provider>;
+}
+export function useToast() { return useContext(ToastContext); }
+export async function copyLink(value: string) { await Clipboard.setStringAsync(value); if (Platform.OS !== 'web') void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {}); }

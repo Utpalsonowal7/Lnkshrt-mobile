@@ -46,7 +46,7 @@ npx eas-cli build:configure
 npm run build:apk
 ```
 
-These steps require your Expo account and project association. `preview` produces an APK; `production` produces a Play Store AAB. No signed APK has been built or published by this source submission. Replace the starter app icons before store release.
+These steps require your Expo account and project association. `preview` produces an APK; `production` produces a Play Store AAB. No signed APK has been built or published by this source submission. Review branding and store metadata before release.
 
 ## Backend compatibility
 

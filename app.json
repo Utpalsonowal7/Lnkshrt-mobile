@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "LnkShrt",
+    "slug": "lnkshrt-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "in.utpx.lnkshrt"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#1D3027",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "in.utpx.lnkshrt"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store"
+    ],
+    "scheme": "lnkshrt",
+    "description": "Your link workspace, in your pocket."
+  }
+}
